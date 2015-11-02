@@ -1,0 +1,4 @@
+gom 'github.com/golang/protobuf/proto'
+gom 'github.com/tpjg/goriakpbc', :commit => 'cdfccd3a1e4f75b234cb4bbf3b911e3a1866a880'
+gom 'github.com/tpjg/goriakpbc/json'
+gom 'github.com/tpjg/goriakpbc/pb'

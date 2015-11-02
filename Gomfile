@@ -1,0 +1,4 @@
+gom 'github.com/golang/protobuf/proto'
+gom 'github.com/tpjg/goriakpbc'
+gom 'github.com/tpjg/goriakpbc/json'
+gom 'github.com/tpjg/goriakpbc/pb'
