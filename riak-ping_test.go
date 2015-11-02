@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 const (
 	AddrTrdbPB   = "localhost:8087"     // riak PB port
@@ -9,10 +12,12 @@ const (
 )
 
 func TestSetLogger(t *testing.T) {
-	var err error
-	Logger, err = SetLogger()
-	if err != nil {
-		t.Errorf("SetLogger is failure status.")
+	if os.Getenv("CI") != "true" {
+		var err error
+		Logger, err = SetLogger()
+		if err != nil {
+			t.Errorf("SetLogger is failure status.")
+		}
 	}
 }
 
