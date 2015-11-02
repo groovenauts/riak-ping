@@ -1,0 +1,7 @@
+language: go
+go:
+  - 1.4
+install:
+  - go get github.com/basho/riak-go-client
+script:
+  - go test -v
