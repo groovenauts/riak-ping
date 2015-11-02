@@ -1,4 +1,5 @@
 # riak-ping
+[![Build Status](https://travis-ci.org/groovenauts/riak-ping.svg)](https://travis-ci.org/groovenauts/riak-ping)
 
 ## Overview
 Check riak connection status.
@@ -60,8 +61,9 @@ GOOS=linux GOARCH=amd64 gom build
 ```
 
 ## Contribution
-1. Pull or Clone
-1. Create a feature branch
-1. Commit your changes
-1. Run test suite with the `gom test -v` command and confirm that it passes
-1. Create new Pull Request
+1. Fork this repository. ([https://github.com/groovenauts/riak-ping/fork](https://github.com/groovenauts/riak-ping))
+1. Create a feature branch.
+1. Commit your changes.
+1. Run test suite with the `gom test -v` command and confirm that it passes.
+1. Run `gofmt -s`.
+1. Create new Pull Request.
