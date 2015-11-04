@@ -12,17 +12,16 @@ import (
 	"github.com/tpjg/goriakpbc"
 )
 
-// Logger パッケージ内で利用出来るよう定義
+// Logger is used to write to syslog.
 var Logger *log.Logger
 
 func main() {
-	// error 変数定義
+	// err is used to store the error.
 	var err error
-	// ip address
+	// argv
 	var flagAddr = flag.String("i", "127.0.0.1:8087", "Riak Server IP Address and Port")
 	var flagProtocol = flag.String("p", "TCP", "Protocol (TCP/PB)")
 	var flagVersion = flag.Bool("v", false, "Print Version Info")
-	// 引数のparse
 	flag.Parse()
 
 	if *flagVersion {
@@ -30,16 +29,16 @@ func main() {
 		os.Exit(0)
 	}
 
-	// log書き込み定義
+	// write setting to syslog
 	Logger, err = SetLogger()
 	if err != nil {
 		panic(err)
 	}
 
-	// riak clientの定義
+	// create riak client
 	myRiak := SetRiakClient(*flagAddr)
 
-	// riak:疎通確認
+	// check riak connection
 	err = CheckConnect(myRiak, *flagProtocol)
 	if err != nil {
 		os.Exit(1)
@@ -48,73 +47,73 @@ func main() {
 	return
 }
 
-// SetLogger log書き込み設定の定義
+// SetLogger define NewLogger
 func SetLogger() (*log.Logger, error) {
-	// Logger を crit / syslog に設定
+	// Logger set (syslog & crit)
 	l, err := syslog.NewLogger(syslog.LOG_CRIT|syslog.LOG_SYSLOG, 0)
 	return l, err
 }
 
-// SetRiakClient riak clientの定義および初期値設定
+// SetRiakClient define NewClient(riak)
 func SetRiakClient(a string) *riak.Client {
-	// Client の定義
 	c := riak.NewClient(a)
 	return c
 }
 
-// CheckConnect 疎通確認
+// CheckConnect wait for the result of limits of the connection
 func CheckConnect(c *riak.Client, t string) error {
-	// ステータスchannel
+	// use goroutine, define channel to use to store result
 	resultCh := make(chan error, 1)
-	// 疎通確認は10secで切断したいので非同期で実施
+	// use goroutine(asynchronous), because the func set a timeout
 	go ConnectRiak(c, t, resultCh)
 
-	// 疎通確認完了 or 10sec経てば CheckConnect を終了
+	// exit conditions: func ConnectRiak is finish or 10sec elasped
 	select {
-	case err := <-resultCh: // 疎通確認が完了(終了フラグがtrue)
+	case err := <-resultCh: // func ConnectRiak is finish
 		if err != nil {
-			// 疎通NG: 画面とsyslogに記載
+			// NG: display the screen and write syslog
 			fmt.Printf("%s Connect Failure.\n", t)
 			if Logger != nil {
 				Logger.Printf("%s Connect Failure.\n", t)
 			}
 		} else {
-			// 疎通OK: 画面のみに記載
+			// OK: display the screen only
 			fmt.Printf("%s Connect Success.\n", t)
 		}
 		return err
-	case <-time.After(time.Second * 10): // 疎通確認処理が終わらず10秒経過した場合
-		// 疎通確認自体がNG: 画面とsyslogに記載
+	case <-time.After(time.Second * 10): // 10sec elasped
+		// display the screen and write syslog
 		fmt.Printf("%s Connect Timed Out.\n", t)
 		if Logger != nil {
 			Logger.Printf("%s Connect Timed Out.\n", t)
 		}
-		// 戻り値のerrorを作成
+		// store the error status
 		err := errors.New("timed out")
 		return err
 	}
 }
 
-// ConnectRiak riakへの接続選択(TCP/PB)および疎通結果の取得
+// ConnectRiak TCP(L4) or PB(L7) connection check to riak
 func ConnectRiak(c *riak.Client, t string, rch chan error) {
 	var err error
 	defer c.Close()
-	// 接続方式の選択
+	// exec riak connection check for each protocol
 	switch {
 	case t == "TCP":
-		// L4レベルでの疎通確認
+		// TCP: set TCP(L4) connection
 		err = c.Connect()
 	case t == "PB":
-		// L7レベルでの疎通確認
+		// PB: set PB(L7) connection
 		err = c.Ping()
 	default:
+		// others: error
 		err = errors.New("unknown protocol")
 	}
-	// 接続結果を error Channel に返す (error型がnilの場合rchに直接渡せないのでifで分岐している)
+	// store the error
 	if err != nil {
 		rch <- err
 	} else {
-		// rch <- err とした場合、err=nilだとロックされてしまうのでnilを直接渡してる。
+		// if err=nil then, rch <- err is locked and wait the routine
 		rch <- nil
 	}
 }
