@@ -1,0 +1,10 @@
+language: go
+go:
+  - 1.5
+install:
+  - go get github.com/mattn/gom
+services:
+  - riak
+script:
+  - gom install
+  - gom test -v
