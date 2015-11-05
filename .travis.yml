@@ -8,3 +8,14 @@ services:
 script:
   - gom install
   - gom test -v
+  - GOOS=linux GOARCH=amd64 gom build
+  - zip riak-ping_linux_amd64.zip riak-ping
+deploy:
+  provider: releases
+  api_key:
+    secure: ZaX40ceW8JB+dJ9LcrLiNEJOP9RlmjjCmhQJVTvhwWTZ5nJVk/B2lk3JdWgUWI3mNCttFCpoRKjZNvNrgdEnLDgo/ebk+1p4iZeknhqtORGkmkPB8WUbnrWWONJxfYxYikKpGK3G86PcDqwcgBFQx0rPFacvyKhTdIJ654DU83+2eXb7pdfOVd5uD90YsL38R2FI5KtJXKW/v/favR2CPCSrjdOpeaOBrO2qjKTRZYRaZKc7aurlPs7ZpVS7140eeZNYgXW2TTxljEgzojTmAmqgyyqM9UUGZholUrOHcnVGdxiA+gcS00TOYCMp0BeTeDb9uZVfFXP6rSSY2kGfiY5Rf/+ficdrPbmbO1yKGlxEM17DgOJ9q9QKvlF5CSJIngxlVI8DqQYuWCveiOI93H3CZZkQZIvmpJm31TmKeCcciqJ4g6aGNhJ2fczJXjKCgkfnu9NXOK152UUfJZe4T7qH7sTuvfiycya7xzEQF1p7pALlH5ilszUZOGjX7qx86YQq1FnYeOr93P+2gSggYvaQZ2jVhXJDoD8O2hchfcouCr2nUNNpwzkmZ560Cguy2DrPaNXgqGXf035q6P4cKZjOcgah4kAJT2S+e2mGrFE3reQ0dNlEnGjks4qePsls+o4Z/iylEcbJgA/DVKmLpjLqB64FYS1prVs/W48cHdU=
+  file: riak-ping_linux_amd64.zip
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: groovenauts/riak-ping
