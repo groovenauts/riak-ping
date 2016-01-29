@@ -1,0 +1,10 @@
+build:
+  image: golang:1.5
+  commands:
+  - go get github.com/mattn/gom
+  - gom install
+  - gom test -v
+
+compose:
+  database:
+    image: riak
